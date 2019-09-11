@@ -78,4 +78,13 @@ theme: hexo-next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/sogou-nyx/nyx.github.io
+  branch: master
+
+# Configration for Theme-Next
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 20
