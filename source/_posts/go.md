@@ -2,7 +2,7 @@
 title: Golang 回调函数和闭包
 date: 2019-09-11 17:02
 tags: 
-- go
+- Golang
 ---
 
 # 回调函数和闭包
