@@ -55,28 +55,33 @@
   };
 </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="ZickZeon">
-<meta property="og:url" content="https://sogou-nyx.github.io/index.html">
+  <meta name="description" content="Logstash to Logstash Communication 实现logstash与logstash之间的通信需要通过lumberjack插件实现。 1.生成证书执行openssl req -x509 -days 3560 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.cert -subj /CN">
+<meta name="keywords" content="ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Logstash to Logstash Communication">
+<meta property="og:url" content="https://sogou-nyx.github.io/2019/09/11/logstash to logstash communication/index.html">
 <meta property="og:site_name" content="ZickZeon">
+<meta property="og:description" content="Logstash to Logstash Communication 实现logstash与logstash之间的通信需要通过lumberjack插件实现。 1.生成证书执行openssl req -x509 -days 3560 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.cert -subj /CN">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-11T09:17:35.149Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ZickZeon">
-  <link rel="canonical" href="https://sogou-nyx.github.io/">
+<meta name="twitter:title" content="Logstash to Logstash Communication">
+<meta name="twitter:description" content="Logstash to Logstash Communication 实现logstash与logstash之间的通信需要通过lumberjack插件实现。 1.生成证书执行openssl req -x509 -days 3560 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.cert -subj /CN">
+  <link rel="canonical" href="https://sogou-nyx.github.io/2019/09/11/logstash to logstash communication/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome: true,
-    isPost: false,
+    isHome: false,
+    isPost: true,
     isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>ZickZeon</title>
+  <title>Logstash to Logstash Communication | ZickZeon</title>
   
 
 
@@ -213,12 +218,13 @@
 
           <div id="content" class="content">
             
+
   <div id="posts" class="posts-expand">
-        <article itemscope itemtype="http://schema.org/Article">
+      <article itemscope itemtype="http://schema.org/Article">
   
   
   
-  <div class="post-block home">
+  <div class="post-block post">
     <link itemprop="mainEntityOfPage" href="https://sogou-nyx.github.io/2019/09/11/logstash to logstash communication/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -231,9 +237,8 @@
       <meta itemprop="name" content="ZickZeon">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2019/09/11/logstash to logstash communication/" class="post-title-link" itemprop="url">Logstash to Logstash Communication</a>
+        <h1 class="post-title" itemprop="name headline">Logstash to Logstash Communication
+
           
         </h1>
 
@@ -275,142 +280,80 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Logstash-to-Logstash-Communication"><a href="#Logstash-to-Logstash-Communication" class="headerlink" title="Logstash to Logstash Communication"></a>Logstash to Logstash Communication</h1><blockquote>
+        <h1 id="Logstash-to-Logstash-Communication"><a href="#Logstash-to-Logstash-Communication" class="headerlink" title="Logstash to Logstash Communication"></a>Logstash to Logstash Communication</h1><blockquote>
 <p>实现logstash与logstash之间的通信需要通过lumberjack插件实现。</p>
-</blockquote><h3 id="1-生成证书"><a href="#1-生成证书" class="headerlink" title="1.生成证书"></a>1.生成证书</h3><p>执行openssl req -x509 -days 3560 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.cert -subj /CN=localhost</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/09/11/logstash to logstash communication/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
+</blockquote><h3 id="1-生成证书"><a href="#1-生成证书" class="headerlink" title="1.生成证书"></a>1.生成证书</h3><p>执行openssl req -x509 -days 3560 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.cert -subj /CN=localhost</p><a id="more"></a>
+
+<p>生成一个lumberjack.cert 和一个lumberjack.key</p>
+<blockquote>
+<p>使用x509方式创建证书默认有效时间是30天，使用days设置过期时间</p>
+</blockquote>
+<h3 id="2-保存证书"><a href="#2-保存证书" class="headerlink" title="2.保存证书"></a>2.保存证书</h3><p>将lumberjack.cert保存在upstream logstash所在服务器（docker服务的话就保存在容器中），将lumberjack.key保存在downstream logstash所在服务器（docker服务的话就保存在容器中）。</p>
+<p>以docker容器的方式启动logstash：</p>
+<p>把私钥和证书保存在同一路径下{local_lumberjack_path}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker-compose.yml中</span><br><span class="line">volumes:</span><br><span class="line">    &#123;local_lumberjack_path&#125;: /usr/share/logstash/lumberjack 将私钥、证书放入容器内部</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-logstash-配置"><a href="#3-logstash-配置" class="headerlink" title="3.logstash 配置"></a>3.logstash 配置</h3><p>建立链接时，upstream logstash使用lumberjack作为output，downstream logstash使用beats作为input，开启ssl认证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">upstream logstash:</span><br><span class="line">output&#123;</span><br><span class="line">    lumberjack &#123;</span><br><span class="line">        port =&gt; 5001</span><br><span class="line">        host =&gt; &quot;**********&quot;</span><br><span class="line">        ssl =&gt; true</span><br><span class="line">        ssl_certificate =&gt; &quot;/usr/share/logstash/lumberjack/lumberjack.cert&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">downstream logstash:</span><br><span class="line">input&#123;</span><br><span class="line">        beats &#123;</span><br><span class="line">            port =&gt; 5001</span><br><span class="line">            codec =&gt; json</span><br><span class="line">            ssl =&gt; true</span><br><span class="line">            ssl_certificate =&gt; &quot;/usr/share/logstash/lumberjack/lumberjack.cert&quot;</span><br><span class="line">            ssl_key =&gt; &quot;/usr/share/logstash/lumberjack/lumberjack.key&quot;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在本项目中，upstream logstash位于aws服务器上，upstream logstash位于广东跳板机上，两台机器通过ssh_tunnel进行通信，端口为5001</p>
+</blockquote>
+<blockquote>
+<p>upstream logstash的数据由logspout（采集服务的日志）提供，logspout部署在aws swarm上，向upstream开启的监听端口5001发送数据</p>
+</blockquote>
+<blockquote>
+<p>数据流向：switch -&gt; logspout -&gt; upstream logstash —ssh_tunnel+lumberjack—&gt; downstream logstash</p>
+</blockquote>
+
     </div>
 
     
     
     
+        
+      
+
       <footer class="post-footer">
-          <div class="post-eof"></div>
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/ELK/" rel="tag"># ELK</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/11/go/" rel="next" title="Golang 回调函数和闭包">
+                  <i class="fa fa-chevron-left"></i> Golang 回调函数和闭包
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
         
       </footer>
+    
   </div>
   
   
   
   </article>
 
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://sogou-nyx.github.io/2019/09/11/go/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="NiuYiXiang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZickZeon">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2019/09/11/go/" class="post-title-link" itemprop="url">Golang 回调函数和闭包</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              
-                
-              
-
-              <time title="Created: 2019-09-11 17:02:00" itemprop="dateCreated datePublished" datetime="2019-09-11T17:02:00+08:00">2019-09-11</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-11 17:02:35" itemprop="dateModified" datetime="2019-09-11T17:02:35+08:00">2019-09-11</time>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="回调函数和闭包"><a href="#回调函数和闭包" class="headerlink" title="回调函数和闭包"></a>回调函数和闭包</h1><h2 id="高阶函数"><a href="#高阶函数" class="headerlink" title="高阶函数"></a>高阶函数</h2><blockquote>
-<p>golang中的高阶函数有以下特性：</p>
-</blockquote><blockquote>
-<ul>
-<li>函数可以作为另一个函数的参数（常用于回调函数）</li>
-</ul>
-</blockquote><blockquote>
-<ul>
-<li>函数可以作为另一个函数的返回值（常用于闭包）</li>
-</ul>
-</blockquote><blockquote>
-<ul>
-<li>函数可以被赋值给一个变量</li>
-</ul>
-</blockquote><h3 id="1-函数作为参数"><a href="#1-函数作为参数" class="headerlink" title="1.函数作为参数"></a>1.函数作为参数</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">added</span><span class="params">(msg <span class="keyword">string</span>, a <span class="keyword">func</span>(a, b <span class="keyword">int</span>)</span> <span class="title">int</span>)</span> &#123;</span><br><span class="line">    fmt.Println(msg, <span class="string">":"</span>, a(<span class="number">33</span>, <span class="number">44</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 函数内部不能嵌套命名函数</span></span><br><span class="line">    <span class="comment">// 所以main()中只能定义匿名函数</span></span><br><span class="line">    f := <span class="function"><span class="keyword">func</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a + b</span><br><span class="line">    &#125;</span><br><span class="line">    added(<span class="string">"a+b"</span>, f)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/09/11/go/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
   </div>
-  
-  
-  
-  </article>
-
-    
-  </div>
-
-  
 
 
           </div>
@@ -429,6 +372,11 @@
 
   <aside class="sidebar">
     <div class="sidebar-inner">
+        
+        
+        
+        
+      
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
@@ -441,6 +389,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Logstash-to-Logstash-Communication"><span class="nav-number">1.</span> <span class="nav-text">Logstash to Logstash Communication</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-生成证书"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.生成证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-保存证书"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.保存证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-logstash-配置"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.logstash 配置</span></a></li></ol></li></ol></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
