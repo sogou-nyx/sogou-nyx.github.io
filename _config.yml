@@ -79,7 +79,7 @@ theme: hexo-next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/sogou-nyx/nyx.github.io
+  repo: https://github.com/sogou-nyx/sogou-nyx.github.io
   branch: master
 
 # Configration for Theme-Next
