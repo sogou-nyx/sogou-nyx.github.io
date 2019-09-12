@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="ZickZeon">
 <meta property="og:description" content="回调函数和闭包高阶函数 golang中的高阶函数有以下特性：   函数可以作为另一个函数的参数（常用于回调函数）    函数可以作为另一个函数的返回值（常用于闭包）    函数可以被赋值给一个变量  1.函数作为参数12345678910111213141516package mainimport &quot;fmt&quot;func added(msg string, a func(a, b int) int)">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-09-11T09:40:27.915Z">
+<meta property="og:updated_time" content="2019-09-11T13:16:25.373Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Golang 回调函数和闭包">
 <meta name="twitter:description" content="回调函数和闭包高阶函数 golang中的高阶函数有以下特性：   函数可以作为另一个函数的参数（常用于回调函数）    函数可以作为另一个函数的返回值（常用于闭包）    函数可以被赋值给一个变量  1.函数作为参数12345678910111213141516package mainimport &quot;fmt&quot;func added(msg string, a func(a, b int) int)">
@@ -287,7 +287,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-11 17:40:27" itemprop="dateModified" datetime="2019-09-11T17:40:27+08:00">2019-09-11</time>
+                <time title="Modified: 2019-09-11 21:16:25" itemprop="dateModified" datetime="2019-09-11T21:16:25+08:00">2019-09-11</time>
               </span>
             
           
@@ -358,9 +358,24 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">(x <span class="keyword">int</span>)</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span>)</span> <span class="title">int</span></span>&#123;</span><br><span class="line">    g := <span class="function"><span class="keyword">func</span><span class="params">(y <span class="keyword">int</span>)</span> <span class="title">int</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x+y</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 返回闭包</span></span><br><span class="line">    <span class="keyword">return</span> g</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 将函数的返回结果"闭包"赋值给变量a</span></span><br><span class="line">    a := f(<span class="number">3</span>)</span><br><span class="line">    <span class="comment">// 调用存储在变量中的闭包函数</span></span><br><span class="line">    res := a(<span class="number">5</span>)</span><br><span class="line">    fmt.Println(res)</span><br><span class="line">    <span class="comment">// 可以直接调用闭包</span></span><br><span class="line">    <span class="comment">// 因为闭包没有赋值给变量，所以它称为匿名闭包</span></span><br><span class="line">    fmt.Println(f(<span class="number">3</span>)(<span class="number">5</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li><p>x不在g的作用域内，并且g引用了x，所以g是一个闭包。</p>
+<li>x不在g的作用域内，并且g引用了x，所以g是一个闭包。</li>
+<li>如果x在传给g之前就被赋值了，g就不能称为闭包了</li>
+</ul>
+<p>闭包特性：</p>
+<ul>
+<li><p>对于每个闭包g来说，不同的g引用不同的x对应的数据对象。或者说f函数的x对应的数据对象对于每个不同的闭包是不一样的。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a := f(<span class="number">1</span>)</span><br><span class="line">b := f(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>以上a和b是两个闭包，两个闭包中的自由变量的数值都是1，但它们不是同一个数值对象</p>
+</blockquote>
 </li>
-<li><p>如果x在传给g之前就被赋值了，g就不能称为闭包了</p>
+<li><p>只要不是匿名闭包，就可以一直访问x对应的同一个数据对象</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a := f(<span class="number">1</span>)<span class="comment">//a是一个有名称的闭包，会一直引用同一个数值对象1</span></span><br><span class="line"></span><br><span class="line">a(<span class="number">3</span>) <span class="comment">//调用闭包a，返回1+3=4，1是一直被闭包a引用的数值对象，执行完以后也不会放开</span></span><br><span class="line">a(<span class="number">3</span>) <span class="comment">//再次调用闭包a，依旧返回4，调用还是跟上一次调用a时相同的数值对象1</span></span><br><span class="line"></span><br><span class="line">f(<span class="number">1</span>)(<span class="number">3</span>) <span class="comment">//匿名的闭包，调用完后就会把数值对象1放开</span></span><br><span class="line">f(<span class="number">1</span>)(<span class="number">3</span>) <span class="comment">//引用的数值对象1与上一次匿名闭包引用的是不同的数值对象，与上一个匿名闭包相互独立</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>虽然g()中持有了自由变量，但是g()函数自身不是闭包函数，只有在g持有的自由变量x和传递给f()函数的x的值(即f(1)中的1)进行<strong>绑定的时候，才会从g()创建一个闭包函数</strong>，这表示闭包函数开始引用这个自由变量，并且这个闭包一直持有这个变量的引用，即使f()已经执行完毕了。</p>
+</blockquote>
 </li>
 </ul>
 <blockquote>
