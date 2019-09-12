@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="ZickZeon">
 <meta property="og:description" content="Golang中的方法Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。1.方法的声明方法声明的形式如下1234type mytype struct &amp;#123;&amp;#125;func (m mytype) method(para">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-09-12T09:19:36.703Z">
+<meta property="og:updated_time" content="2019-09-12T09:21:13.721Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Golang中的方法">
 <meta name="twitter:description" content="Golang中的方法Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。1.方法的声明方法声明的形式如下1234type mytype struct &amp;#123;&amp;#125;func (m mytype) method(para">
@@ -287,7 +287,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-12 17:19:36" itemprop="dateModified" datetime="2019-09-12T17:19:36+08:00">2019-09-12</time>
+                <time title="Modified: 2019-09-12 17:21:13" itemprop="dateModified" datetime="2019-09-12T17:21:13+08:00">2019-09-12</time>
               </span>
             
           
@@ -347,7 +347,9 @@
 <blockquote>
 <p>Go语言的struct支持嵌套多个匿名字段，也就是说一个struct可以有多个内部struct，相当于支持多重继承</p>
 </blockquote>
-<h2 id="5-重写String-方法"><a href="#5-重写String-方法" class="headerlink" title="5.重写String()方法"></a>5.重写String()方法</h2>
+<h2 id="5-重写String-方法"><a href="#5-重写String-方法" class="headerlink" title="5.重写String()方法"></a>5.重写String()方法</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">	age  <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Person)</span> <span class="title">String</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> p.name + <span class="string">": "</span> + strconv.Itoa(p.age)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mian</span><span class="params">()</span></span> &#123;</span><br><span class="line">  p := <span class="built_in">new</span>(Person)</span><br><span class="line">	<span class="comment">// p := Person&#123;&#125;</span></span><br><span class="line">	p.name = <span class="string">"nyx"</span></span><br><span class="line">	p.age = <span class="number">24</span></span><br><span class="line">	fmt.Println(p) <span class="comment">//nyx: 24</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
     </div>
 
     
