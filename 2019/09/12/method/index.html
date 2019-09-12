@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta name="google-site-verification" content="wMosudLmasJtueod7k7uHs1LPRnOpYzU_osrPCNT5Zs">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Golang中的方法Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。1.方法的声明方法声明的形式如下1234type mytype struct &amp;#123;&amp;#125;func (m mytype) method(para">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang 回调函数和闭包">
+<meta property="og:url" content="https://sogou-nyx.github.io/2019/09/12/method/index.html">
+<meta property="og:site_name" content="ZickZeon">
+<meta property="og:description" content="Golang中的方法Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。1.方法的声明方法声明的形式如下1234type mytype struct &amp;#123;&amp;#125;func (m mytype) method(para">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-12T08:59:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang 回调函数和闭包">
+<meta name="twitter:description" content="Golang中的方法Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。1.方法的声明方法声明的形式如下1234type mytype struct &amp;#123;&amp;#125;func (m mytype) method(para">
+  <link rel="canonical" href="https://sogou-nyx.github.io/2019/09/12/method/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Golang 回调函数和闭包 | ZickZeon</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZickZeon</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">A stupid man</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Searching..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://sogou-nyx.github.io/2019/09/12/method/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="NiuYiXiang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZickZeon">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Golang 回调函数和闭包
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-12 00:00:00" itemprop="dateCreated datePublished" datetime="2019-09-12T00:00:00+08:00">2019-09-12</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-12 16:59:21" itemprop="dateModified" datetime="2019-09-12T16:59:21+08:00">2019-09-12</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Golang中的方法"><a href="#Golang中的方法" class="headerlink" title="Golang中的方法"></a>Golang中的方法</h1><p>Golang并非是面向对象的语言，但是它可以模拟面向对象。Golang中的struct就类似于面向对象语言中的类，那么既然有了类，就要有对应的类的方法。Golang中以接收器（reciever）的形式实现struct的方法。</p><h2 id="1-方法的声明"><a href="#1-方法的声明" class="headerlink" title="1.方法的声明"></a>1.方法的声明</h2><p>方法声明的形式如下</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> mytype <span class="keyword">struct</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m mytype)</span> <span class="title">method</span><span class="params">(para)</span> <span class="title">return_type</span></span> &#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *mytype)</span> <span class="title">method</span><span class="params">(para)</span> <span class="title">return_type</span></span> &#123;&#125;</span><br></pre></td></tr></table></figure><a id="more"></a>
+
+
+
+<blockquote>
+<p>这就表示方法method是绑定在mytype上的，就类似于面向对象语言中类的成员方法</p>
+</blockquote>
+<p>下面是一个实例</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Point <span class="keyword">struct</span> &#123;</span><br><span class="line">	X, Y <span class="keyword">float64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Distance</span><span class="params">(p, q Point)</span> <span class="title">float64</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> math.Hypot(q.X-p.X, q.Y-p.Y)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//类型Point的方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p Point)</span> <span class="title">Distance</span><span class="params">(q Point)</span> <span class="title">float64</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> math.Hypot(q.X-p.X, q.Y-p.Y)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p := Point&#123;<span class="number">1</span>, <span class="number">2</span>&#125;</span><br><span class="line">	q := Point&#123;<span class="number">4</span>, <span class="number">6</span>&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(Distance(p, q))</span><br><span class="line">	<span class="comment">//p调用属于类型Point的方法Distance</span></span><br><span class="line">	fmt.Println(p.Distance(q))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>以上例子中，虽然声明了两个同名的Distance函数，但是不会报错。因为第一个是属于当前包的包级别函数，第二个是属于Point类的方法。</li>
+<li>Go语言中，不同类型可以有相同的方法名，只要定义方法时用接收器区分开就可以。</li>
+</ul>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myslice []<span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s myslice)</span> <span class="title">sum</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	sum := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> s &#123;</span><br><span class="line">		sum += v</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sum</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	s := myslice&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">	fmt.Println(s.sum())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>Go语言中，与面向对象语言不同的是它不仅仅可以为struct定义方法，也可以为type定义的类型别名、slice、map、channel、func类型定义方法。但内置简单数据类型(int、float等)不行，interface类型不行。</li>
+<li>上述不可以为简单类型定义方法，可以通过使用type a int这种形式为简单类型定义方法。</li>
+<li>面向对象语言中，类的方法要定义在类的内部，Go语言中struct可以与方法的定义分开在不同的文件中，但一定要在一个包内。</li>
+<li>方法就是函数，所以Go语言中没有重载的概念，同一类型中所有方法名都必须唯一</li>
+</ul>
+</blockquote>
+<h2 id="2-方法和函数的区别"><a href="#2-方法和函数的区别" class="headerlink" title="2.方法和函数的区别"></a>2.方法和函数的区别</h2><p>本质上方法就是函数，方法是绑定了类型的特殊函数，需要指定类型的实例才可以调用。</p>
+<h2 id="3-值类型和指针类型的接受者"><a href="#3-值类型和指针类型的接受者" class="headerlink" title="3.值类型和指针类型的接受者"></a>3.值类型和指针类型的接受者</h2><p>如果接收者是一个指针类型，那么同实例化类型一样会自动解除引用</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//实例化类型</span></span><br><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;name, age <span class="keyword">int</span>&#125;</span><br><span class="line"></span><br><span class="line">p := Person&#123;&#125;<span class="comment">//值类型的Person实例</span></span><br><span class="line">p1 := <span class="built_in">new</span>(Person)<span class="comment">//指针类型的实例</span></span><br><span class="line"><span class="comment">//在需要访问或调用mytype实例属性时候，如果发现它是一个指针类型的变量，Go会自动将其解除引用</span></span><br><span class="line">p.name = <span class="string">"xxs"</span></span><br><span class="line">p1.name = <span class="string">"sdad"</span><span class="comment">//不需要(*p1).name</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//接收者为指针类型</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *mytype1)</span> <span class="title">add</span><span class="params">()</span> <span class="title">ret_type</span></span> &#123;&#125;</span><br><span class="line">a.add()<span class="comment">//不需要(*a).add()</span></span><br></pre></td></tr></table></figure>
+
+<p>方法的接受者有两种类型：值类型和指针类型。它们在使用上有很大的区别</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p person)</span> <span class="title">setname</span><span class="params">(name <span class="keyword">string</span>)</span></span> &#123; p.name = name &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *person)</span> <span class="title">setage</span><span class="params">(age <span class="keyword">int</span>)</span></span> &#123; p.age = age &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>对于setname方法，它的reciever是值类型的，那么在接收参数时是拷贝完整的Person的数据结构，无论实例是值类型还是指针类型，方法内部使用和修改的都是实例的副本，不会影响外部原始副本的值。</li>
+<li>对于setage方法，它的reciever是指针类型的，那么在接收参数时是拷贝指针，无论实例是值类型还是指针类型，方法内部使用和修改的都是原始实例的数据。</li>
+</ul>
+<p>如下例所示</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">	age  <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Person)</span> <span class="title">getname</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> p.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Person)</span> <span class="title">getage</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> p.age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这里比较reciever是值类型和指针类型的区别</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p Person)</span> <span class="title">setname</span><span class="params">(name <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	p.name = name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Person)</span> <span class="title">setage</span><span class="params">(age <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	p.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p1 := Person&#123;&#125;</span><br><span class="line">	p1.setname(<span class="string">"nyx"</span>)</span><br><span class="line">	p1.setage(<span class="number">10</span>)</span><br><span class="line">	fmt.Println(p1.getname())<span class="comment">//输出""</span></span><br><span class="line">	fmt.Println(p1.getage())<span class="comment">//输出10</span></span><br><span class="line"></span><br><span class="line">	p2 := <span class="built_in">new</span>(Person)</span><br><span class="line">	p2.setname(<span class="string">"nyx"</span>)</span><br><span class="line">	p2.setage(<span class="number">10</span>)</span><br><span class="line">	fmt.Println(p2.getname())<span class="comment">//输出""</span></span><br><span class="line">	fmt.Println(p2.getage())<span class="comment">//输出10</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-嵌套struct中的方法"><a href="#4-嵌套struct中的方法" class="headerlink" title="4.嵌套struct中的方法"></a>4.嵌套struct中的方法</h2><p>与属性类似，内部struct的方法也会被嵌套，外部struct可以直接调用内部struct的方法。如果外部struct有方法与内部strcut方法同名，那么直接调用的话就是调用外部strcut的方法，想要调用内部struct的对应方法需要使用间接调用的方式</p>
+<blockquote>
+<p>Go语言的struct支持嵌套多个匿名字段，也就是说一个struct可以有多个内部struct，相当于支持多重继承</p>
+</blockquote>
+<h2 id="5-重写String-方法"><a href="#5-重写String-方法" class="headerlink" title="5.重写String()方法"></a>5.重写String()方法</h2>
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/11/logstash to logstash communication/" rel="next" title="Logstash to Logstash Communication">
+                  <i class="fa fa-chevron-left"></i> Logstash to Logstash Communication
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Golang中的方法"><span class="nav-number">1.</span> <span class="nav-text">Golang中的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-方法的声明"><span class="nav-number">1.1.</span> <span class="nav-text">1.方法的声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-方法和函数的区别"><span class="nav-number">1.2.</span> <span class="nav-text">2.方法和函数的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-值类型和指针类型的接受者"><span class="nav-number">1.3.</span> <span class="nav-text">3.值类型和指针类型的接受者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-嵌套struct中的方法"><span class="nav-number">1.4.</span> <span class="nav-text">4.嵌套struct中的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-重写String-方法"><span class="nav-number">1.5.</span> <span class="nav-text">5.重写String()方法</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/uploads/avatar.png"
+      alt="NiuYiXiang">
+  <p class="site-author-name" itemprop="name">NiuYiXiang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="https://github.com/sogou-nyx" title="GitHub &rarr; https://github.com/sogou-nyx" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="/nyx@sogou-inc.com" title="E-Mail &rarr; nyx@sogou-inc.com"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NiuYiXiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
