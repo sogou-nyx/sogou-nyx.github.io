@@ -164,3 +164,22 @@ func main() {
 
 ## 5.重写String()方法
 
+```go
+type Person struct {
+	name string
+	age  int
+}
+
+func (p *Person) String() string {
+	return p.name + ": " + strconv.Itoa(p.age)
+}
+
+func mian() {
+  p := new(Person)
+	// p := Person{}
+	p.name = "nyx"
+	p.age = 24
+	fmt.Println(p) //nyx: 24
+}
+```
+
